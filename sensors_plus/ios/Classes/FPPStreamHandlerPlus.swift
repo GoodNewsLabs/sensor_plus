@@ -20,7 +20,7 @@ func _initMotionManager() {
         _motionManager.accelerometerUpdateInterval = 0.2
         _motionManager.deviceMotionUpdateInterval = 0.2
         _motionManager.gyroUpdateInterval = 0.2
-        _motionManager.magnetometerUpdateInterval = 0.2
+        _motionManager.deviceMotionUpdateInterval = 0.2
     }
 }
 
@@ -183,7 +183,7 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
     var samplingPeriod = 200000 {
         didSet {
             _initMotionManager()
-            _motionManager.magnetometerUpdateInterval = Double(samplingPeriod) * 0.000001
+            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
         }
     }
 
@@ -192,7 +192,7 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
         _initMotionManager()
-        _motionManager.startMagnetometerUpdates(to: OperationQueue()) { data, error in
+        _motionManager.startDeviceMotionUpdates(using: .xArbitraryCorrectedZVertical, to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -205,7 +205,7 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
                 return
             }
             let magneticField = data!.magneticField
-            sendTriplet(x: magneticField.x, y: magneticField.y, z: magneticField.z, sink: sink)
+            sendTriplet(x: magneticField.field.x, y: magneticField.field.y, z: magneticField.field.z, sink: sink)
         }
         return nil
     }
